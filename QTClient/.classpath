@@ -6,5 +6,10 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="lib" path="C:/Users/rocco/git/repository3/QTClient/lib/mockito-core-5.18.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/rocco/git/repository3/QTClient/lib/mockito-junit-jupiter-5.18.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/rocco/git/repository3/QTClient/lib/byte-buddy-agent-1.17.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/rocco/git/repository3/QTClient/lib/byte-buddy-1.17.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

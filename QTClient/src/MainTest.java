@@ -43,6 +43,24 @@ public class MainTest {
 		out.flush();
 		in = new ObjectInputStream(socket.getInputStream());
 	}
+	
+	 /**
+     * Costruttore utilizzato per l'iniezione delle dipendenze in un contesto di testing.
+     * <p>
+     * Invece di creare stream di rete reali, questo costruttore permette di "iniettare"
+     * oggetti mock (finti) degli stream. Questo è fondamentale per i test con Mockito,
+     * in quanto consente di simulare le risposte del server e verificare le richieste del client
+     * senza una connessione di rete reale.
+     * </p>
+     *
+     * @param out Lo stream di output (reale o mock) verso il server.
+     * @param in  Lo stream di input (reale o mock) dal server.
+     * @see test.MainTestMockTest
+     */
+	public MainTest(ObjectOutputStream out, ObjectInputStream in) {
+	    this.out = out;
+	    this.in = in;
+	}
 
 	/**
 	 * Mostra il menu principale all'utente e acquisisce la sua scelta.
@@ -68,6 +86,38 @@ public class MainTest {
 		return answer;
 	}
 
+	
+	/**
+     * Esegue la logica di base per richiedere un cluster set da un file, disaccoppiata dall'input utente.
+     * <p>
+     * Questa versione del metodo è stata introdotta tramite refactoring per separare la logica di
+     * comunicazione con il server dalla lettura dell'input da tastiera (gestita dalla classe {@code Keyboard}).
+     * In questo modo, il test può invocare direttamente questa logica, passando un nome di file predefinito
+     * e verificandone il comportamento in modo isolato.
+     * </p>
+     *
+     * @param fileNameToLoad Il nome del file da inviare al server.
+     * @return Una stringa contenente la rappresentazione del cluster set caricato.
+     * @throws SocketException se si verifica un errore a livello di socket TCP.
+     * @throws ServerException se il server risponde con un messaggio di errore.
+     * @throws IOException se si verifica un errore generico di I/O.
+     * @throws ClassNotFoundException se un oggetto ricevuto non può essere deserializzato.
+     * @see #learningFromFile()
+     */
+	
+	private String learningFromFile(String fileNameToLoad) throws SocketException, ServerException, IOException, ClassNotFoundException {
+	    out.writeObject(3);
+	    
+	    // Invia direttamente il nome del file passato come argomento
+	    out.writeObject(fileNameToLoad);
+	    
+	    String result = (String) in.readObject();
+	    if (result.equals("OK"))
+	        return (String) in.readObject();
+	    else
+	        throw new ServerException(result);
+	}
+	
 	/**
 	 * Richiede al server di caricare un cluster set da un file.
 	 * Invia il codice operazione 3.
@@ -78,18 +128,13 @@ public class MainTest {
 	 * @throws IOException se si verifica un errore generico di I/O.
 	 * @throws ClassNotFoundException se un oggetto ricevuto non può essere deserializzato.
 	 */
+
+	
 	private String learningFromFile() throws SocketException, ServerException, IOException, ClassNotFoundException {
-		out.writeObject(3);
-		
-		System.out.print("Nome del file da cui caricare i cluster: ");
-		String fileNameToLoad = Keyboard.readString();
-		out.writeObject(fileNameToLoad);
-		
-		String result = (String) in.readObject();
-		if (result.equals("OK"))
-			return (String) in.readObject();
-		else
-			throw new ServerException(result);
+	    System.out.print("Nome del file da cui caricare i cluster: ");
+	    String fileNameToLoad = Keyboard.readString();
+	    
+	    return learningFromFile(fileNameToLoad);
 	}
 
 	/**
